@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سندك في النقل</title>
+    <link rel="icon" href="./image/icon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --primary-light: #1e293b;
+            --accent-color: #f59e0b;
+            --accent-hover: #d97706;
+            --text-light: #f8fafc;
+            --text-gray: #94a3b8;
+            --glass-bg: rgba(255,255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body { 
+            font-family: 'Cairo', 'Tajawal', sans-serif !important;
+            background-color: var(--primary-dark); 
+            color: var(--text-light); 
+            overflow-x: hidden;
+            line-height: 1.7; 
+        }
+        
+        /* Cursor */
+        .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 99999; pointer-events: none; }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-hover); }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--accent-color); transition: 0.2s; }
+        body.hovering .cursor-outline { width: 60px; height: 60px; background-color: rgba(245, 158, 11, 0.1); border-color: transparent; }
+
+        /* Preloader */
+        #preloader { position: fixed; inset: 0; background-color: var(--primary-dark); z-index: 10000; display: flex; justify-content: center; align-items: center; transition: transform 0.8s ease-in-out; }
+        .truck-icon { font-size: 4rem; color: var(--accent-color); animation: bounce 1s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+
+        /* Header */
+        header { position: fixed; width: 100%; top: 0; z-index: 1000; padding: 20px 0; transition: all 0.4s ease; background: transparent; }
+        header.scrolled { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 10px 0; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+        .nav-container { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-link { text-decoration: none; display: flex; align-items: center; flex-shrink: 0; }
+        .logo-box { display: flex; align-items: center; gap: 12px; }
+        .logo-img { height: 73px; width: auto; transition: height 0.4s; }
+        .nav-links { display: flex; gap: 40px; list-style: none; }
+        .nav-links a { color: var(--text-light); text-decoration: none; position: relative; transition: 0.3s; font-weight: 500; font-size: 1.1rem;}
+        .nav-links a::before { content: ''; position: absolute; bottom: -5px; right: 0; width: 0; height: 2px; background: var(--accent-color); transition: 0.3s; }
+        .nav-links a:hover::before { width: 100%; }
+        .btn-premium { padding: 12px 28px; background: linear-gradient(45deg, var(--accent-color), #d97706); color: white; border-radius: 30px; font-weight: bold; box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); transition: 0.3s; position: relative; overflow: hidden; border: none; text-decoration: none; display: inline-block; }
+        .btn-premium:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(245, 158, 11, 0.4); }
+
+        /* Hero */
+        .hero { height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; }
+        .hero-bg { position: absolute; inset: 0; background: url('./image/WhatsApp Image 2026-01-10 at 2.44.35 AM.jpeg') no-repeat center/cover; filter: brightness(0.4); z-index: -1; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to left, rgba(15,23,42,0.9), rgba(15,23,42,0.4)); z-index: -1; }
+        .hero-content { max-width: 700px; padding: 0 40px; }
+        .hero h1 { font-size: 4.5rem; line-height: 1.1; margin-bottom: 25px; background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.3rem; color: var(--text-gray); margin-bottom: 40px; border-right: 4px solid var(--accent-color); padding-right: 20px; }
+
+        /* Common */
+        .section-padding { padding: 100px 0; }
+        .container { max-width: 1200px; margin: auto; padding: 0 15px; }
+        .section-title { text-align: center; margin-bottom: 60px; }
+        .section-title h2 { font-size: 3rem; margin-bottom: 15px; }
+        .section-title span { color: var(--accent-color); }
+
+        /* Features */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 40px; max-width: 1400px; margin: 0 auto; }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); padding: 40px; border-radius: 20px; transition: 0.4s; }
+        .glass-card:hover { transform: translateY(-15px); border-color: var(--accent-color); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .glass-icon { font-size: 3rem; color: var(--accent-color); margin-bottom: 25px; }
+
+        /* Portfolio */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .portfolio-item { position: relative; border-radius: 15px; overflow: hidden; height: 250px; cursor: pointer; }
+        .portfolio-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .portfolio-item:hover img { transform: scale(1.1); }
+        .portfolio-overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: 0.3s; }
+        .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+        .portfolio-overlay h4 { color: var(--accent-color); margin-bottom: 10px; transform: translateY(20px); transition: 0.3s; }
+        .portfolio-item:hover .portfolio-overlay h4 { transform: translateY(0); }
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .lightbox.active { display: flex; animation: fadeIn 0.3s; }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 10px; }
+        .close-lightbox { position: absolute; top: 30px; right: 30px; font-size: 3rem; color: white; transition: 0.3s; cursor: pointer; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Stats */
+        .counters { background: var(--primary-light); padding: 80px 0; margin-top: 50px; }
+        .counter-box { text-align: center; }
+        .counter-box h3 { font-size: 3.5rem; color: var(--accent-color); font-weight: 800; }
+
+        /* REVIEWS CSS */
+        #reviews { background-color: var(--primary-dark) !important; width: 100%; overflow: hidden; padding: 50px 0; }
+        #reviews .section-title h2 { color: var(--text-light); }
+        #reviews .reviews-layout { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 30px; margin-bottom: 30px; }
+        
+        .swiper.testimonials { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 50px; overflow: visible; position: relative; }
+        .swiper.testimonials .swiper-slide { height: auto !important; display: flex; justify-content: center; width: auto; }
+        #reviews .testi-card { background: white; color: #333; padding: 30px !important; border-radius: 15px; margin: 0 auto; height: 380px !important; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.05); width: 100%; max-width: 400px; }
+
+        .swiper-button-next, .swiper-button-prev { width: 45px; height: 45px; background: rgba(245, 158, 11, 0.9); border-radius: 50%; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.3s; top: 50%; transform: translateY(-50%); z-index: 10; inset-inline-start: 10px; inset-inline-end: 10px; }
+        .swiper-button-next:hover, .swiper-button-prev:hover { background: var(--accent-hover); transform: translateY(-50%) scale(1.1); }
+
+        .stars-display { color: var(--accent-color); margin-bottom: 15px; font-size: 1.1rem; }
+        .testi-card h4 { font-size: 1.3rem; margin-top: 20px; }
+        .rating-input { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-direction: row-reverse; }
+        .rating-input i { font-size: 1.5rem; color: #ddd; transition: 0.2s; cursor: none; } 
+        .rating-input i.active, .rating-input i:hover, .rating-input i:hover ~ i { color: var(--accent-color); }
+
+        /* ==========================
+           UPDATED ADD REVIEW BOX (DARK MODE)
+           ========================== */
+        #reviews .add-review-card { 
+            background: rgba(15, 23, 42, 0.6); /* شفاف داكن */
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* حد خفيف */
+            color: var(--text-light); /* نص أبيض */
+            width: 100%; 
+            max-width: 600px; 
+            padding: 35px; 
+            border-radius: 20px; 
+            height: fit-content; 
+            margin: 0 auto; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+        }
+
+        /* تخصيص الحقول داخل البوكس الجديد */
+        #reviews .add-review-card .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        
+        #reviews .add-review-card .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+
+        #reviews .add-review-card .form-label {
+            color: #cbd5e1;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        #reviews .add-review-card h3 {
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        /* ==========================
+           UPDATED CONTACT CSS SECTION
+           ========================== */
+        .contact-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 30px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.5); max-width: 1200px; margin: 0 auto; }
+        .contact-info-side { background: var(--accent-color); padding: 60px; color: white; }
+        .contact-form-side { background: white; padding: 60px; color: #333; }
+        
+        /* الروابط في جانب المعلومات */
+        .contact-info-side a {
+            text-decoration: none;
+            color: white;
+            cursor: pointer; 
+            display: inline-flex;
+            align-items: center;
+            transition: transform 0.3s ease, color 0.3s ease; /* التحريك + اللون */
+        }
+
+        /* التأثير عند مرور الماوس على الرابط: كل عنصر يتحرك لوحده */
+         
+        /* الروابط في جانب المعلومات */
+.contact-info-side a {
+    text-decoration: none;
+    color: white;
+    cursor: pointer; 
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.3s ease; /* حركة فقط */
+}
+
+/* النصوص والروابط تتحرك عند Hover بدون تغيير اللون */
+.contact-info-side a:hover {
+    transform: translateX(5px) scale(1.05); /* النصوص تكبر شوي وتتحرك */
+    color: white; /* اللون ثابت */
+}
+
+/* الأيقونات داخل الروابط */
+.contact-info-side a i {
+    margin-left: 10px;
+    font-size: 1.6rem; /* تكبير الأيقونات شوي */
+    transition: transform 0.3s ease;
+}
+
+/* عند Hover على الأيقونات نفسها */
+.contact-info-side a i:hover {
+    transform: scale(1.5) translateY(-5px); /* الأيقونات تكبر أكثر وترتفع */
+    color: white; /* اللون ثابت */
+}
+
+/* السوشيال أيقونات فقط */
+.contact-info-side .fab {
+    font-size: 1.8rem; /* أكبر من أيقونات العادية */
+    transition: transform 0.3s ease;
+}
+
+.contact-info-side .fab:hover {
+    transform: scale(1.5) translateY(-5px); /* تكبر وترتفع */
+    color: white; /* اللون ثابت */
+}
+
+        /* زر الإرسال في الفورم */
+        .contact-form-side .btn-premium {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .contact-form-side .btn-premium:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        /* تحسين مظهر الفورم */
+        .contact-form-side .form-group,
+        .contact-form-side .location-group {
+            margin-bottom: 20px;
+        }
+
+        .contact-form-side .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        .contact-form-side .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .contact-form-side .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        
+        /* تنسيقات جديدة للحقول */
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .location-group { position: relative; }
+
+        /* Whatsapp Float */
+        .float-wa { position: fixed; bottom: 40px; left: 40px; background: #25d366; color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); z-index: 999; transition: 0.3s; animation: pulse 2s infinite; }
+        .float-wa:hover { transform: scale(1.1); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+
+        /* Custom Toast Notification */
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: white; color: #333; padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 30000; display: flex; align-items: center; gap: 10px; transition: 0.5s; border-right: 5px solid var(--accent-color); min-width: 300px; }
+        .toast.success i { color: #10b981; }
+        .toast.error i { color: #ef4444; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* MOBILE ONLY */
+        @media (max-width: 768px) {
+            body, html { overflow-x: hidden; }
+            * { max-width: 100%; }
+            header { padding: 10px 0; }
+            .nav-container { width: 100%; padding: 0 15px; }
+            .nav-links { display: none; }
+            .logo-img { height: 70px; }
+            .hero { width: 100%; min-height: 100vh; padding-top: 140px; padding-bottom: 60px; }
+            .hero-content { width: 100%; max-width: 100%; padding: 0 15px; text-align: center; }
+            .hero h1 { font-size: 2.2rem; line-height: 1.4; }
+            .section-padding { padding: 60px 0; }
+            .container { width: 100%; max-width: 100%; padding: 0 15px; }
+            .section-title h2 { font-size: 2rem; }
+            .features-grid { width: 100%; max-width: 100%; padding: 0 15px; grid-template-columns: 1fr !important; gap: 20px; }
+            .glass-card { padding: 25px; }
+            .portfolio-grid { width: 100%; grid-template-columns: 1fr !important; gap: 15px; }
+            .portfolio-item { height: 200px; }
+            .counters { padding: 50px 0; }
+            .counter-box h3 { font-size: 2.5rem; }
+            .swiper.testimonials { padding: 0 15px; }
+            #reviews .testi-card { height: auto !important; min-height: 250px !important; padding: 25px 20px !important; }
+            #reviews .add-review-card { width: 100% !important; max-width: 100% !important; padding: 25px 20px !important; }
+            .swiper-button-next, .swiper-button-prev { display: none !important; }
+            .contact-container { grid-template-columns: 1fr !important; }
+            .contact-info-side, .contact-form-side { padding: 30px 15px; }
+            .grid-2-col { grid-template-columns: 1fr !important; flex-direction: column; gap: 0; }
+            .cursor-dot, .cursor-outline { display: none; }
+            * { cursor: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Preloader -->
+    <div id="preloader"><div class="loader-content"><i class="fas fa-truck-moving truck-icon"></i><h2 style="color:white; margin-top:20px; letter-spacing: 3px;">سندك في النقل</h2></div></div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toastNotification">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">تمت العملية بنجاح</span>
+    </div>
+
+    <a href="https://wa.me/201207281471" class="float-wa" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <div class="lightbox" id="lightbox"><span class="close-lightbox">&times;</span><img src="" alt="Full view" id="lightbox-img"></div>
+
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo-link">
+                <div class="logo-box">
+                    <img src="./image/ChatGPT Image Jan 10, 2026, 05_35_52 PM.png" alt="شعار الشركة" class="logo-img">
+                </div>
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home" class="hover-trigger">الرئيسية</a></li>
+                    <li><a href="#features" class="hover-trigger">خدماتنا</a></li>
+                    <li><a href="#portfolio" class="hover-trigger">معرض الأعمال</a></li>
+                    <li><a href="#reviews" class="hover-trigger">آراء العملاء</a></li>
+                    <li><a href="#contact" class="hover-trigger">تواصل معنا</a></li>
+                </ul>
+            </nav>
+            <a href="#contact" class="btn-premium hover-trigger">احجز الآن</a>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-bg"></div><div class="hero-overlay"></div>
+        <div class="container">
+            <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+                <h1>ننقل أثاثك بذكاء <br> <span style="color:var(--accent-color)">ودقة فائقة</span></h1>
+                <p>انقل وانت مطمّن مع سندك في النقل. نقل سريع وآمن بضمان كامل على سلامة العفش، التزام بالمواعيد، وتنفيذ من باب لباب بدون قلق.</p>
+                <div style="display: flex; gap: 20px;">
+                    <a href="#contact" class="btn-premium hover-trigger">ابدأ الرحلة</a>
+                    <a href="#portfolio" class="hover-trigger" style="border: 2px solid white; color: white; padding: 12px 35px; border-radius: 30px; transition: 0.3s; text-decoration: none;">شاهد أعمالنا</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <section id="features" class="section-padding">
+    <div class="section-title" data-aos="fade-up">
+        <h2>خدماتنا <span>الاستثنائية</span></h2>
+        <p style="color: #aaa;">نقدم لك مستوى من الخدمة لم تعهده من قبل</p>
+    </div>
+
+    <div class="features-grid">
+
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="100">
+            <i class="fas fa-cube glass-icon"></i>
+            <h3>تغليف  يحمي كل قطعة</h3>
+            <p style="color: #cbd5e1; margin-top: 15px;">
+                مش بنلف وخلاص! بنستخدم خامات تغليف حديثة ومتخصصة تحمي الأثاث من الخبط،
+                الكسر، والتراب والرطوبة، عشان يوصل كأنه جديد بالظبط مهما كانت المسافة أو الارتفاع.
+            </p>
+        </div>
+
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="200">
+            <i class="fas fa-shield-alt glass-icon"></i>
+            <h3>تأمين شامل وراحة بال</h3>
+            <p style="color: #cbd5e1; margin-top: 15px;">
+                اطمّن على أثاثك. تأمين كامل أثناء النقل والرفع،
+                مع إجراءات أمان دقيقة وخطوات مدروسة تخليك مطمّن
+                من أول لحظة لحد ما تستلم كل حاجة سليمة 100٪.
+            </p>
+        </div>
+
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="300">
+            <i class="fas fa-cogs glass-icon"></i>
+            <h3>فنيين متخصصين </h3>
+            <p style="color: #cbd5e1; margin-top: 15px;">
+                خبرة + احترافية. فريق مدرّب على أعلى مستوى في الفك والتركيب والنقل،
+                بيتعامل مع الأثاث بعناية ودقة، ويحل أي موقف بسرعة ومن غير أي تلف.
+            </p>
+        </div>
+
+        <div class="glass-card" data-aos="fade-up" data-aos-delay="400">
+            <i class="fas fa-map-marked-alt glass-icon"></i>
+            <h3>أوناش ذكية لأعلى الأدوار</h3>
+            <p style="color: #cbd5e1; margin-top: 15px;">
+                الارتفاع مش عائق. أوناش ذكية ومتعددة بتوصل لحد الدور الـ30،
+                وأوناش هيدروليك لحد الدور الـ17، تنفيذ سريع،
+                أمان كامل، وتوفير وقت ومجهود عليك.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+
+    <section id="portfolio" class="section-padding">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up"><h2>معرض <span>الأعمال</span></h2><p style="color: #aaa;">جولة بصرية في بعض عمليات النقل التي قمنا بها</p></div>
+
+            <div class="portfolio-grid">
+                <div class="portfolio-item" data-aos="zoom-in"><img src="./image/1.jpg" alt="نقل عفش"><div class="portfolio-overlay"><span>نقل عفش</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/2.jpg" alt="نقل عفش"><div class="portfolio-overlay"><span>اوناش هيدروليك</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="200"><img src="./image/13.jpeg" alt="نقل فيلات"><div class="portfolio-overlay"><span>اوناشف VIP</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="300"><img src="./image/14.jpeg" alt="غرف معيشة"><div class="portfolio-overlay"><span>تغليف غرف </span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/8.jpg" alt="اسطول شاحنات"><div class="portfolio-overlay"><span>اسطول شاحنات</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/12.jpeg" alt="نقل سلم"><div class="portfolio-overlay"><span>نقل سلم </span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/17.jpg" alt="اسطول شحنات"><div class="portfolio-overlay"><span>اوناش هيدروليك</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/16.jpeg" alt="فنيين تغليف"><div class="portfolio-overlay"><span>فنيين تغليف</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/9.jpeg" alt="نقل الاثاث"><div class="portfolio-overlay"><span>اوناش هيدروليك</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/4.jpg" alt="اوناش هيدروليك"><div class="portfolio-overlay"><span>اوناش هيدروليك</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/10.jpeg" alt="تغليف غرف"><div class="portfolio-overlay"><span>فنيين تغليف</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="200"><img src="./image/15.jpeg" alt="فنيين محترفين"><div class="portfolio-overlay"><span>فنيين متخصصين</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/3.jpg" alt="اوناش هيدروليك"><div class="portfolio-overlay"><span>اوناش هيدروليك</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100"><img src="./image/11.jpeg" alt="اوناش vip"><div class="portfolio-overlay"><span>اوناش vip</span></div></div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="200"><img src="./image/18.jpg" alt="اوناش هيدروليك"><div class="portfolio-overlay"><span>اوناش هيدروليك</span></div></div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="counters">
+        <div class="container">
+            <div class="features-grid">
+                <div class="counter-box"><h3 data-target="10">0</h3><p>سنوات خبرة</p></div>
+                <div class="counter-box"><h3 data-target="10000">0</h3><p>عميل راضٍ</p></div>
+                <div class="counter-box"><h3 data-target="50">0</h3><p>شاحنة حديثة</p></div>
+                <div class="counter-box"><h3 data-target="100">0</h3><p>% نسبة الأمان</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REVIEWS SECTION -->
+    <section id="reviews" class="section-padding">
+        <div class="container">
+            <div class="section-title"><h2>آراء <span>عملائنا</span></h2></div>
+            
+            <div class="reviews-layout">
+                <!-- Swiper Container -->
+                <div class="swiper testimonials">
+                    <div class="swiper-wrapper" id="reviewsContainer">
+                        <!-- سيتم ملء السلايدز هنا بواسطة JS -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+
+                <!-- Add Review Form (DARK MODE STYLE) -->
+                <div class="add-review-card">
+                    <h3 style="text-align:center;">أضف تقييمك</h3>
+                    <form id="userReviewForm">
+                        <div class="rating-input hover-trigger" id="starRating">
+                            <i class="fas fa-star" data-value="5"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="1"></i>
+                        </div>
+                        <input type="hidden" id="ratingValue" value="0" required>
+                        <div class="form-group">
+                            <label for="reviewerName" class="form-label">اسمك</label>
+                            <input type="text" class="form-control" id="reviewerName" placeholder="ادخل اسمك" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reviewerText" class="form-label">تجربتك معنا...</label>
+                            <textarea class="form-control" id="reviewerText" rows="3" placeholder="اكتب تقييمك هنا..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-premium" style="width:100%; border:none;">نشر التقييم</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UPDATED CONTACT SECTION -->
+    <section id="contact" class="section-padding">
+        <div class="container">
+            <div class="contact-container" data-aos="zoom-in">
+                
+                <!-- جانب المعلومات -->
+                <div class="contact-info-side">
+                    <h3 style="font-size: 2.5rem; margin-bottom: 20px;">تواصل معنا</h3>
+                    <p style="margin-bottom: 40px; opacity: 0.9;">فريق خدمة العملاء جاهز للرد عليك 24 ساعة. اطلب عرض سعر الآن.</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-phone-alt"></i> 
+                        <a href="tel:01091262400">01091262400</a>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-phone-alt"></i> 
+                        <a href="tel:01207281471">01207281471</a>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-envelope"></i> 
+                        <a href="mailto:atemohamed434@gmail.com">atemohamed434@gmail.com</a>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <a href="https://maps.google.com/?q=القبارى+الاسكندرية" target="_blank">القباري – الإسكندرية</a>
+                    </div>
+
+                    <div style="margin-top: 70px; display: flex; gap: 30px;">
+                        <a href="https://www.facebook.com/USERNAME" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://www.instagram.com/USERNAME" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://wa.me/201091262400" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- جانب الفورم (محتوى جديد ومفصل) -->
+                <div class="contact-form-side">
+                    <h3 style="margin-bottom: 30px; color: #1e293b;">طلب عرض سعر </h3>
+                    <form id="premiumForm">
+                        <!-- البيانات الشخصية -->
+                        <div class="grid-2-col">
+                            <div class="form-group">
+                                <label for="name" class="form-label">الاسم بالكامل</label>
+                                <input type="text" class="form-control" id="name" placeholder="اسمك" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label">رقم الهاتف</label>
+                                <input type="tel" class="form-control" id="phone" placeholder="رقم التواصل" required>
+                            </div>
+                        </div>
+
+                        <!-- بيانات النقل الأساسية -->
+                        <div class="form-group">
+                            <label for="moveDate" class="form-label">تاريخ النقل </label>
+                            <input type="date" class="form-control" id="moveDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="serviceType" class="form-label">الخدمة المطلوبة</label>
+                            <select class="form-control" id="serviceType" required>
+                                <option value="" disabled selected>اختر نوع الخدمة</option>
+                                <option value="نقل عفش كامل">نقل عفش كامل (فك وتركيب)</option>
+                                <option value="نقل فقط">نقل فقط (بدون فك وتركيب)</option>
+                                <option value="تغليف فقط">تغليف وتجهيز فقط</option>
+                                <option value="اوناش رفع">أوناش رفع (لأعلى الأدوار)</option>
+                                <option value="اخرى">أخرى</option>
+                            </select>
+                        </div>
+
+                        <!-- تفاصيل المكان -->
+                        <div style="margin-bottom: 10px; font-weight: bold; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;">تفاصيل المكان</div>
+                        
+                        <!-- من أين -->
+                        <div class="grid-2-col" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+                            <div class="location-group">
+                                <label for="fromLocation" class="form-label">من (المدينة/المنطقة)</label>
+                                <input type="text" class="form-control" id="fromLocation" placeholder="مثال:	smouha" required>
+                            </div>
+                            <div class="location-group">
+                                <label for="fromFloor" class="form-label">الدور من</label>
+                                <input type="number" class="form-control" id="fromFloor" placeholder="دور رقم" min="0" required>
+                            </div>
+                        </div>
+
+                        <!-- إلى أين -->
+                        <div class="grid-2-col" style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+                            <div class="location-group">
+                                <label for="toLocation" class="form-label">إلى (المدينة/المنطقة)</label>
+                                <input type="text" class="form-control" id="toLocation" placeholder="مثال:	miami" required>
+                            </div>
+                            <div class="location-group">
+                                <label for="toFloor" class="form-label">الدور إلى</label>
+                                <input type="number" class="form-control" id="toFloor" placeholder="دور رقم" min="0" required>
+                            </div>
+                        </div>
+
+                        <!-- ملاحظات إضافية -->
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="msg" class="form-label">تفاصيل إضافية عن العفش</label>
+                            <textarea class="form-control" id="msg" rows="4" placeholder="ذكر تفاصيل مثل عدد غرف النوم، وجود أجهزة ثقيلة، أو استخدام مصعد..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-premium" style="width: 100%;">إرسال الطلب </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // UI Initialization
+            AOS.init({ once: true, offset: 100 });
+            const preloader = document.getElementById('preloader');
+            
+            window.addEventListener('load', () => {
+                setTimeout(() => { preloader.style.transform = 'translateY(-100%)'; }, 1000);
+            });
+            
+            // Custom Cursor Logic
+            const cursorDot = document.querySelector('.cursor-dot'), cursorOutline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', (e) => {
+                cursorDot.style.left = e.clientX + 'px'; cursorDot.style.top = e.clientY + 'px';
+                cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 500, fill: "forwards" });
+            });
+            document.querySelectorAll('a, button, .glass-card, input, textarea, .portfolio-item').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+
+            // Header Scroll Logic
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', () => { if(window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled'); });
+
+            // Counters
+            const counters = document.querySelectorAll('.counter-box h3');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        counters.forEach(counter => {
+                            const target = +counter.getAttribute('data-target'); const inc = target / 200;
+                            const update = () => { const count = +counter.innerText; if(count < target) { counter.innerText = Math.ceil(count + inc); setTimeout(update, 20); } else counter.innerText = target + "+"; };
+                            update();
+                        }); observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            if(document.querySelector('.counters')) observer.observe(document.querySelector('.counters'));
+
+            // Lightbox
+            const lightbox = document.getElementById('lightbox'), lightboxImg = document.getElementById('lightbox-img'), closeLightbox = document.querySelector('.close-lightbox');
+            document.querySelectorAll('.portfolio-item').forEach(item => item.addEventListener('click', () => { lightboxImg.src = item.querySelector('img').src; lightbox.classList.add('active'); }));
+            closeLightbox.addEventListener('click', () => lightbox.classList.remove('active'));
+            lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('active'); });
+
+            // ==========================================
+            // REVIEWS LOGIC (Full Fetch & Update)
+            // ==========================================
+            
+            const staticSlidesData = [
+                { stars: 5, text: "أفضل شركة تعاملت معها. الدقة في المواعيد والاهتمام بالتفاصيل الصغيرة جعلت الانتقال سهلاً جداً.", author: "أحمد محمد", role: "رجل أعمال" },
+                { stars: 4.5, text: "الفريق محترف للغاية، فكوا وركبوا غرفة النوم في أقل من ساعة بدون أي خدوش.", author: "سارة علي", role: "ربة منزل" },
+                { stars: 5, text: "خدمة التخزين ممتازة، الأثاث خرج نظيفاً وكأنه جديد.", author: "محمود حسن", role: "مهندس معماري" }
+            ];
+
+            // الدالة لتوليد النجوم
+            function getStarsHTML(rating) {
+                let html = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= rating) html += '<i class="fas fa-star"></i>';
+                    else if (i - 0.5 === rating) html += '<i class="fas fa-star-half-alt"></i>';
+                    else html += '<i class="far fa-star"></i>';
+                }
+                return html;
+            }
+
+            let reviewsSwiper = null;
+
+            // الدالة المسؤولة عن بناء الـ DOM ثم تهيئة السلايدر
+            async function initReviewsSlider() {
+                // 1. تجميع البيانات
+                let allReviews = [...staticSlidesData];
+                try {
+                    const res = await fetch('/api/reviews');
+                    if (res.ok) {
+                        const apiData = await res.json();
+                        allReviews = [...allReviews, ...apiData];
+                    }
+                } catch (e) {
+                    console.warn('API not available, using static data only.');
+                }
+
+                // 2. بناء HTML (Create & Append)
+                const wrapper = document.querySelector('.swiper.testimonials .swiper-wrapper');
+                wrapper.innerHTML = ''; // مسح أي محتوى قديم
+
+                allReviews.forEach(rev => {
+                    const slide = document.createElement('div');
+                    slide.classList.add('swiper-slide');
+                    
+                    // تحديد البيانات (ثابتة أو من API)
+                    const name = rev.author || rev.name || 'عميل';
+                    const role = rev.role || 'عميل سعيد';
+                    const rating = rev.stars || rev.rating || 5;
+                    const text = rev.text || rev.review || 'تجربة رائعة';
+
+                    slide.innerHTML = `
+                        <div class="testi-card">
+                            <div class="stars-display">${getStarsHTML(rating)}</div>
+                            <i class="fas fa-quote-right" style="color:#ddd; margin-bottom:15px;"></i>
+                            <p>"${text}"</p>
+                            <h4 style="margin-top: 20px;">${name}</h4>
+                            <span style="font-size: 0.9rem; color: #888;">${role}</span>
+                        </div>
+                    `;
+                    wrapper.appendChild(slide);
+                });
+
+                // 3. تهيئة Swiper (Init)
+                if (reviewsSwiper) {
+                    reviewsSwiper.destroy(true, true);
+                }
+
+                reviewsSwiper = new Swiper(".swiper.testimonials", {
+                    loop: true,
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                    grabCursor: true,
+                    centeredSlides: false,
+                    speed: 800,
+                    autoplay: { delay: 3000, disableOnInteraction: false },
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                    breakpoints: {
+                        0: { slidesPerView: 1 },
+                        768: { slidesPerView: 2 },
+                        1024: { slidesPerView: 3 }
+                    }
+                });
+            }
+
+            // Run Logic
+            initReviewsSlider();
+
+            // Form Handling (Contact) - Updated with new fields
+            const contactForm = document.getElementById('premiumForm');
+            if(contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = contactForm.querySelector('button');
+                    const originalText = btn.innerText; 
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال'; 
+                    btn.disabled = true;
+                    
+                    // إرسال البيانات للسيرفر (Updated FormData)
+                    const formData = {
+                        name: document.getElementById('name').value,
+                        phone: document.getElementById('phone').value,
+                        moveDate: document.getElementById('moveDate').value,
+                        serviceType: document.getElementById('serviceType').value,
+                        fromLocation: document.getElementById('fromLocation').value,
+                        fromFloor: document.getElementById('fromFloor').value,
+                        toLocation: document.getElementById('toLocation').value,
+                        toFloor: document.getElementById('toFloor').value,
+                        msg: document.getElementById('msg').value
+                    };
+
+                    try {
+                        await fetch('/api/bookings', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        });
+                        showToast('تم استلام طلبك بنجاح! سنتواصل معك قريباً.', 'success'); 
+                        contactForm.reset();
+                    } catch (err) {
+                        showToast('حدث خطأ في الاتصال', 'error');
+                    } finally {
+                        btn.innerText = originalText; btn.disabled = false;
+                    }
+                });
+            }
+
+            // Form Handling (Review)
+            const reviewForm = document.getElementById('userReviewForm');
+            let currentRating = 0;
+            const stars = document.querySelectorAll('.rating-input i');
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    currentRating = star.getAttribute('data-value');
+                    stars.forEach(s => s.style.color = s.getAttribute('data-value') <= currentRating ? 'var(--accent-color)' : '#ddd');
+                });
+            });
+
+            reviewForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(currentRating == 0) return showToast('الرجاء اختيار تقييم بالنجوم', 'error');
+                const btn = reviewForm.querySelector('button'); 
+                const originalText = btn.innerText;
+                btn.innerHTML = 'جاري النشر...';
+                btn.disabled = true;
+                
+                const reviewData = {
+                    reviewerName: document.getElementById('reviewerName').value,
+                    ratingValue: currentRating,
+                    reviewerText: document.getElementById('reviewerText').value
+                };
+
+                try {
+                    await fetch('/api/reviews', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(reviewData)
+                    });
+                    showToast('شكراً لك! تم إضافة تقييمك.', 'success');
+                    reviewForm.reset(); currentRating = 0;
+                    stars.forEach(s => s.style.color = '#ddd');
+                    
+                    // إعادة تشغيل السلايدر بالكامل (Destroy & Rebuild)
+                    initReviewsSlider();
+                } catch (err) {
+                    showToast('حدث خطأ أثناء النشر', 'error');
+                } finally {
+                    btn.innerText = originalText; btn.disabled = false;
+                }
+            });
+        });
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const icon = toast.querySelector('i');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.className = `toast ${type} show`;
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>
