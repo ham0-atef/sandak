@@ -7,13 +7,11 @@ const app = express();
 const PORT = 3000;
 const DB_FILE = path.join(__dirname, 'data.json');
 
-// الوسائط (Middleware)
+// الوسائط (Middleware) الأساسية
 app.use(cors());
 app.use(express.json());
-// استضافة الملفات الثابتة من مجلد public
-app.use(express.static('public')); 
 
-// --- دوال التعامل مع ملف البيانات (JSON) ---
+// --- تم النقل: دوال التعامل مع ملف البيانات يجب أن تكون قبل العداد ---
 function readDB() {
     if (!fs.existsSync(DB_FILE)) {
         // إنشاء ملف بيانات افتراضي إذا لم يكن موجوداً
@@ -39,8 +37,9 @@ function writeDB(data) {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
 }
 
-// --- تتبع زيارات الموقع ---
+// --- تم النقل: كود تتبع الزيارات يجب أن يكون هنا وقبل استضافة الملفات ---
 app.use((req, res, next) => {
+    // تم التعديل: التحقق من أن المسار هو الصفحة الرئيسية لتجنب حساب زيارات الملفات والصور
     if (req.path === '/' && req.method === 'GET') {
         const db = readDB();
         db.visits = (db.visits || 0) + 1;
@@ -48,6 +47,9 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+// --- استضافة الملفات الثابتة (يجب أن تأتي بعد العداد) ---
+app.use(express.static('public')); 
 
 // --- 1. API تسجيل الدخول ---
 app.post('/api/login', (req, res) => {
